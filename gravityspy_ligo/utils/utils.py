@@ -243,23 +243,27 @@ def label_q_scans(filenames_of_images_to_classify, path_to_cnn, **kwargs):
 
     if model_type == "original":
         image_size = [140, 170]
-        image_data_for_cnn = pandas.DataFrame()
+        image_data_for_cnn = {}
         for image in filenames_of_images_to_classify:
             if verbose:
                 logger.info('Converting {0}'.format(image))
 
             image_data = read_image.read_grayscale(image,
                                                    resolution=0.3)
-            image_data_for_cnn[image.split('/')[-1]] = [image_data]
+            image_data_for_cnn[image.split('/')[-1]] = pandas.Series([image_data])
+        image_data_for_cnn = pandas.concat(image_data_for_cnn.values(), axis=1, ignore_index=True)
+        image_data_for_cnn.columns = image_data_for_cnn.keys()
     elif model_type == "yunan":
         image_size = [448, 448]
-        image_data_for_cnn = pandas.DataFrame()
+        image_data_for_cnn = {}
         for image in filenames_of_images_to_classify:
             if verbose:
                 logger.info('Converting {0}'.format(image))
 
             image_data = read_image.read_data_yunan_model(image)
-            image_data_for_cnn[image.split('/')[-1]] = [image_data]
+            image_data_for_cnn[image.split('/')[-1]] = pandas.Series([image_data])
+        image_data_for_cnn = pandas.concat(image_data_for_cnn.values(), axis=1, ignore_index=True)
+        image_data_for_cnn.columns = image_data_for_cnn.keys()
 
     # Now label the image
     if verbose:
@@ -321,7 +325,7 @@ def label_select_images(filename1, filename2, filename3, filename4,
     if verbose:
         logger.info('Converting image to ML readable...')
 
-    image_data_for_cnn = pandas.DataFrame()
+    image_data_for_cnn = {}
 
     for list_of_images in list_of_images_all:
         for image in list_of_images:
@@ -331,7 +335,10 @@ def label_select_images(filename1, filename2, filename3, filename4,
 
             image_data = read_image.read_grayscale(image,
                                                    resolution=0.3)
-            image_data_for_cnn[image_name] = [image_data]
+            image_data_for_cnn[image_name] = pandas.Seres([image_data])
+
+    image_data_for_cnn = pandas.concat(image_data_for_cnn.values(), axis=1, ignore_index=True)
+    image_data_for_cnn.columns = image_data_for_cnn.keys()
 
     # Now label the image
     if verbose:
@@ -380,7 +387,7 @@ def get_features_select_images(filename1, filename2, filename3, filename4,
     list_of_images_all = zip(list_of_images_all[0], list_of_images_all[1],
                              list_of_images_all[2], list_of_images_all[3])
 
-    image_data_for_cnn = pandas.DataFrame()
+    image_data_for_cnn = {}
 
     for list_of_images in list_of_images_all:
         for image in list_of_images:
@@ -390,7 +397,10 @@ def get_features_select_images(filename1, filename2, filename3, filename4,
 
             image_data_r, image_data_g, image_data_b = read_image.read_rgb(image,
                                                                            resolution=0.3)
-            image_data_for_cnn[image] = [[image_data_r, image_data_g, image_data_b]]
+            image_data_for_cnn[image] = pandas.Series([image_data_r, image_data_g, image_data_b])
+
+    image_data_for_cnn = pandas.concat(image_data_for_cnn.values(), axis=1, ignore_index=True)
+    image_data_for_cnn.columns = image_data_for_cnn.keys()
 
     features, ids = label_glitches.get_multiview_feature_space(image_data=image_data_for_cnn,
                                        semantic_model_name='{0}'.format(path_to_semantic_model),
