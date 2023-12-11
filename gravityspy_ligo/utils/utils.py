@@ -420,7 +420,7 @@ def get_features(filenames_of_images_to_classify, path_to_semantic_model, **kwar
         logger = log.Logger('Gravity Spy: Extracting Feature Space')
         logger.info('Converting image to RGB readable...')
 
-    image_data_for_si = pandas.DataFrame()
+    image_data_for_si = {}
     for image in filenames_of_images_to_classify:
         if verbose:
             logger.info('Converting {0}'.format(image))
@@ -428,6 +428,9 @@ def get_features(filenames_of_images_to_classify, path_to_semantic_model, **kwar
         image_data_r, image_data_g, image_data_b = read_image.read_rgb(image,
                                                                        resolution=0.3)
         image_data_for_si[image.split('/')[-1]] = [[image_data_r, image_data_g, image_data_b]]
+
+    image_data_for_si = pandas.concat(image_data_for_si.values(), axis=1, ignore_index=True)
+    image_data_for_si.columns = data_join_npv.keys()
 
     # Now label the image
     if verbose:
