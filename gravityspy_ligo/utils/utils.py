@@ -427,7 +427,7 @@ def get_features(filenames_of_images_to_classify, path_to_semantic_model, **kwar
 
         image_data_r, image_data_g, image_data_b = read_image.read_rgb(image,
                                                                        resolution=0.3)
-        image_data_for_si[image.split('/')[-1]] = [[image_data_r, image_data_g, image_data_b]]
+        image_data_for_si[image.split('/')[-1]] = pandas.Series([image_data_r, image_data_g, image_data_b])
 
     image_data_for_si = pandas.concat(image_data_for_si.values(), axis=1, ignore_index=True)
     image_data_for_si.columns = data_join_npv.keys()
@@ -474,14 +474,17 @@ def get_deeplayer(plot_directory, path_to_cnn, **kwargs):
     if verbose:
         logger.info('Converting image to ML readable...')
 
-    image_data_for_cnn = pandas.DataFrame()
+    image_data_for_cnn = {}
     for image in list_of_images:
         if verbose:
             logger.info('Converting {0}'.format(image))
 
         image_data = read_image.read_grayscale(os.path.join(plot_directory, image),
                                                resolution=0.3)
-        image_data_for_cnn[image] = [image_data]
+        image_data_for_cnn[image] = pandas.Seres([image_data])
+
+    image_data_for_cnn = pandas.concat(image_data_for_cnn.values(), axis=1, ignore_index=True)
+    image_data_for_cnn.columns = data_join_npv.keys()
 
     # Now label the image
     if verbose:
